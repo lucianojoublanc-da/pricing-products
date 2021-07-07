@@ -3,7 +3,83 @@
 % Last Change: Mon Jul 05 11:00 am 2021 C
 %
 \documentclass[a4paper]{article}
+\usepackage[]{amsmath, amssymb}
 \begin{document}
-hello, world $1 + 1$ !
-\end{document}
 
+\section{Exercise}
+For the following products:
+
+\begin{itemize}
+\item fixed rate, coupon paying bond
+\item interest rate swap pay fixed / receive floating
+\end{itemize}
+
+Perform the following exercises:
+
+\subsection{Write down the Eber/Jones expression}
+
+Use this definition:
+
+\begin{align*}
+Claim := & Zero \\
+|& One \\
+|& Give \; Claim \\
+|& Scale \; Observable \; Claim \\
+|& And \; Claim \; Claim \\
+|& Or \; Claim \; Claim \\
+|& Cond \; Inequality \; Claim \; Claim \\
+|& When \; Inequality \; Cliam \\
+|& Anytime \; Inequality \; Claim \\
+|& Until \; Inequality \; Claim \\
+Inequality := & TimeGte \; t \\
+| & Lte \; Observable \; Observable \\
+\end{align*}
+I've included the below for completeness, but you can ignore this and just write down $Observe$ as $S_t$ and $Const$ as e.g. $K$, and the operators as $+, -, \times$.
+\begin{align*}
+Observable := & Const \\
+| & Observe \\
+| & Add \; Observable \; Observable \\
+| & Neg \; Observable \\
+| & Mul \; Observable \; Observable
+\end{align*}
+
+
+For example, for a European call option:
+
+\begin{align*}
+  t &:= \text{ time to maturity} \\
+  K &:= \text{ strike price} \\
+  S_t &:= \text{ the (observed) stock price, follows GBM} \\
+  & When (TimeGte \; T) (Or (Scale (K - S_t) (One USD)) Zero)
+\end{align*}
+
+Check that this matches with what is produced by our implementation in https://github.com/digital-asset/contingent-claims
+
+\subsection{Transform to expectations using E1-E10}
+
+For example, the above would translate recursively to
+
+\begin{align*}
+& When (TimeGte \; T) (Or (Scale (K - S_t) (One USD)) Zero) & \\
+=& When (TimeGte \; T) (Or (Scale (K - S_t) \mathbb{E}[exch(USD, USD) | \mathcal{F}_t] \quad \mathbb{E}[0 | \mathcal{F}_t])& \text{by E1, E2} \\
+=& When (TimeGte \; T) (Or (\mathbb{E}[(K - S_t) | \mathcal{F}_t] \times \mathbb{E}[exch(USD, USD)], \mathbb{E}[0 | \mathcal{F}_t] ) & \text{by E4} \\
+=& When (TimeGte \; T) (max(\mathbb{E}[(K - S_t)| \mathcal{F}_t] \times \mathbb{E}[exch(USD, USD)],  \mathbb{E}[0 | \mathcal{F}_t]) & \text{by E6} \\
+=& \mathbb{E}^Q [\frac{max(\mathbb{E}[(K - S_t)| \mathcal{F}_t] \times \mathbb{E}[exch(USD, USD)],  \mathbb{E}[0 | \mathcal{F}_t])}{USD_t} | \mathcal{F}_T] & \text{by E8}
+\end{align*}
+
+The numeraire on the last line comes from the assumption that we're pricing the security in USD. So it's the USD discount rate.
+
+\subsection{Simplify the expectation to an analytical price}
+
+This is where you would use 'change of numeraire' if necessary - in this example it's not.
+
+\begin{align*}
+=& \mathbb{E}^Q [\frac{max(\mathbb{E}[(K - S_t)| \mathcal{F}_t] \times 1, 0)}{USD_t} | \mathcal{F}_T] & \text{by } exch \text{ identity, const} \\
+=& \mathbb{E}^Q [\frac{\mathbb{E}[(K - S_t)| \mathcal{F}_t] }{USD_t} | \mathcal{F}_T] & K, S_t \geq 0 \text{ (GBM)} \\
+=& \mathbb{E}^Q [\mathbb{E}[\frac{(K - S_t)}{USD_t}| \mathcal{F}_t ]  | \mathcal{F}_T] & \text{ USD is t-adapted } \\
+=& \mathbb{E}^Q [\frac{(K - S_t)}{USD_t}|  \mathcal{F}_t] & \text{ tower property }
+\end{align*}
+
+\subsection{Verify your results by numerical approximation (or otherwise)}
+
+\end{document}
