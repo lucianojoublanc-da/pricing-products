@@ -73,7 +73,9 @@ For example, the above would translate (co)recursively to
 = & Q_t \mathbb{E}^Q[ \frac{  (K - S_T) I_{K \geq S_T} } { Q_T } | \mathcal{F}_t ] \\
 \end{align*}
 
-Note that here I've \emph{not} written everything in terms of filtered expectations. I'm not sure anymore if this is helpful - I think that it's enough to observe that the tower property applies to nested $When$ expressions; also, you established that $Until$ in it's current form is not an expectation. Also note that I've now expaned this co-recursively (i.e. from the outside in / top to bottom) rather than recursively (inside-out / leaves-to-root). This is so the assignment of $T$ is clear.
+Note that here I've \emph{not} written everything in terms of filtered expectations. I'm not sure anymore if this is helpful - I think that it's enough to observe that the tower property applies to nested $When$ expressions; also, you established that $Until$ in it's current form is not an expectation. 
+
+Also note that I've now expaned this co-recursively (i.e. from the outside in / top to bottom) rather than recursively (inside-out / leaves-to-root). This is so the assignment of $T$ is clear.
 
 \section{Simplify the expectation to an analytical price}
 
@@ -81,13 +83,11 @@ This is where you would use 'change of numeraire' if necessary - in this example
 
 \begin{align*}
 & Q_t \mathbb{E}^Q[ \frac{  (K - S_T) I_{K \geq S_T} } { Q_T } | \mathcal{F}_t ] \\
-& \text{for $t = 0$, without loss of generality, $Q(0) = 1$ and } \\
-= & \mathbb{E}^Q[ \frac{  (K - S_T) I_{K \geq S_T} } { Q_T } | \mathcal{F}_0 ] \\
-= & \mathbb{E}^Q[ \frac{K} {Q_T} I_{K \geq S_T} | \mathcal{F}_0 ] - \mathbb{E}^Q[ \frac{S_T} {Q_T} I_{K \geq S_T} | \mathcal{F}_0 ] \\
-& \text{but note that by FAPF, $\frac{S_t}{Q_t} = E^Q[\frac{S_T}{Q_T} | F_t]$, i.e. the term is a Radon-Nykodim derivative. } \\
-= & \frac{K} {Q_T} \mathbb{E}^Q[  I_{K \geq S_T} | \mathcal{F}_0 ] - \frac{S_0} {Q_0} \mathbb{E}^{*}[  I_{K \geq S^*_T} | \mathcal{F}_0 ] \\
-& \text{taking out $Q(t)$ by assuming it's deterministic, and again $Q(0) = 1$} \\
-= & K e^{-rT} \mathbb{P}^Q[K \geq S_T] - S_0 \mathbb{P}^{*}[K \geq S^*_T] \\
+= & Q_t \mathbb{E}^Q[ \frac{K} {Q_T} I_{K \geq S_T} | \mathcal{F}_t ] - Q_t \mathbb{E}^Q[ \frac{S_T} {Q_T} I_{K \geq S_T} | \mathcal{F}_t ] \\
+& \text{quotient in the RHS is a Radom-Nykodim derivative, so by FAPF $\frac{S_t}{Q_t} = E^Q[\frac{S_T}{Q_T} | F_t]$} \\
+& \text{and for LHS term, let's assume $Q(t)$ is deterministic, then} \\
+= & \frac{Q^t} {Q_T} K \mathbb{E}^Q[  I_{K \geq S_T} | \mathcal{F}_t ] - \frac{Q_t}{Q_t} S_t \mathbb{E}^{*}[  I_{K \geq S^*_T} | \mathcal{F}_t ] \\
+= & K e^{-r(T-t)} \mathbb{P}^Q[K \geq S_T] - S_t \mathbb{P}^{*}[K \geq S^*_T] \\
 \end{align*}
 
 With some more working, and taking care to use the appropriate measure $Q$ or $*$, this reduces to the Black formula.
