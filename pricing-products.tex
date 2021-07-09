@@ -6,7 +6,7 @@
 \usepackage[]{amsmath, amssymb}
 \begin{document}
 
-\section{Exercise}
+\section*{Exercise}
 For the following products:
 
 \begin{itemize}
@@ -16,7 +16,7 @@ For the following products:
 
 Perform the following exercises:
 
-\subsection{Write down the Eber/Jones expression}
+\section{Write down the Eber/Jones expression}
 
 Use this definition:
 
@@ -44,42 +44,54 @@ Observable := & Const \\
 \end{align*}
 
 
-For example, for a European call option:
+For example, for a European put option:
 
 \begin{align*}
   t &:= \text{ time to maturity} \\
   K &:= \text{ strike price} \\
   S_t &:= \text{ the (observed) stock price, follows GBM} \\
-  & When (TimeGte \; T) (Or (Scale (K - S_t) (One USD)) Zero)
+  Q_t & := \text{ the USD discount rate } \\
+  & When (TimeGte \; T) (Or (Scale (K - S_t) (One Q_t)) Zero)
 \end{align*}
+
+
+Assume we are pricing in USD.
 
 Check that this matches with what is produced by our implementation in https://github.com/digital-asset/contingent-claims
 
-\subsection{Transform to expectations using E1-E10}
+\section{Transform to expectations using E1-E10}
 
-For example, the above would translate recursively to
+For example, the above would translate (co)recursively to
 
 \begin{align*}
-& When (TimeGte \; T) (Or (Scale (K - S_t) (One USD)) Zero) & \\
-=& When (TimeGte \; T) (Or (Scale (K - S_t) \mathbb{E}[exch(USD, USD) | \mathcal{F}_t] \quad \mathbb{E}[0 | \mathcal{F}_t])& \text{by E1, E2} \\
-=& When (TimeGte \; T) (Or (\mathbb{E}[(K - S_t) | \mathcal{F}_t] \times \mathbb{E}[exch(USD, USD)], \mathbb{E}[0 | \mathcal{F}_t] ) & \text{by E4} \\
-=& When (TimeGte \; T) (max(\mathbb{E}[(K - S_t)| \mathcal{F}_t] \times \mathbb{E}[exch(USD, USD)],  \mathbb{E}[0 | \mathcal{F}_t]) & \text{by E6} \\
-=& \mathbb{E}^Q [\frac{max(\mathbb{E}[(K - S_t)| \mathcal{F}_t] \times \mathbb{E}[exch(USD, USD)],  \mathbb{E}[0 | \mathcal{F}_t])}{USD_t} | \mathcal{F}_T] & \text{by E8}
+& When \quad (TimeGte \; T) \quad (Or \; (Scale \: (K - S_t) \: (One Q_t)) \; Zero) \\
+= & Q_t \mathbb{E}^Q[ \frac{ Or \; (Scale \: (K - S_{t = T}) \: (One Q_{t = T})) \; Zero } { Q_T } | \mathcal{F}_t ] & \text{ by E8} \\
+= & Q_t \mathbb{E}^Q[ \frac{ max ( Scale \: (K - S_T) \: (One Q_T) , Zero ) } { Q_T } | \mathcal{F}_t ] & \text{ by E6} \\
+& \text{ by definition of $max$, and assuming no correlation to $Zero$, } \\
+= & Q_t \mathbb{E}^Q[ \frac{  A \times I_A  + Zero \times I_{A^c}} { Q_T } | \mathcal{F}_t ] , & \{ A : Scale \: (K - S_T) \: (One Q_T) \geq Zero \} \\
+= & Q_t \mathbb{E}^Q[ \frac{  A \times I_A } { Q_T } | \mathcal{F}_t ] , & \{ A : (K - S_T) \times 1 \geq 0 \} \text{ by E1, E2, E4} \\
+= & Q_t \mathbb{E}^Q[ \frac{  (K - S_T) I_{K \geq S_T} } { Q_T } | \mathcal{F}_t ] \\
 \end{align*}
 
-The numeraire on the last line comes from the assumption that we're pricing the security in USD. So it's the USD discount rate.
+Note that here I've \emph{not} written everything in terms of filtered expectations. I'm not sure anymore if this is helpful - I think that it's enough to observe that the tower property applies to nested $When$ expressions; also, you established that $Until$ in it's current form is not an expectation. Also note that I've now expaned this co-recursively (i.e. from the outside in / top to bottom) rather than recursively (inside-out / leaves-to-root). This is so the assignment of $T$ is clear.
 
-\subsection{Simplify the expectation to an analytical price}
+\section{Simplify the expectation to an analytical price}
 
 This is where you would use 'change of numeraire' if necessary - in this example it's not.
 
 \begin{align*}
-=& \mathbb{E}^Q [\frac{max(\mathbb{E}[(K - S_t)| \mathcal{F}_t] \times 1, 0)}{USD_t} | \mathcal{F}_T] & \text{by } exch \text{ identity, const} \\
-=& \mathbb{E}^Q [\frac{\mathbb{E}[(K - S_t)| \mathcal{F}_t] }{USD_t} | \mathcal{F}_T] & K, S_t \geq 0 \text{ (GBM)} \\
-=& \mathbb{E}^Q [\mathbb{E}[\frac{(K - S_t)}{USD_t}| \mathcal{F}_t ]  | \mathcal{F}_T] & \text{ USD is t-adapted } \\
-=& \mathbb{E}^Q [\frac{(K - S_t)}{USD_t}|  \mathcal{F}_t] & \text{ tower property }
+& Q_t \mathbb{E}^Q[ \frac{  (K - S_T) I_{K \geq S_T} } { Q_T } | \mathcal{F}_t ] \\
+& \text{for $t = 0$, without loss of generality, $Q(0) = 1$ and } \\
+= & \mathbb{E}^Q[ \frac{  (K - S_T) I_{K \geq S_T} } { Q_T } | \mathcal{F}_0 ] \\
+= & \mathbb{E}^Q[ \frac{K} {Q_T} I_{K \geq S_T} | \mathcal{F}_0 ] - \mathbb{E}^Q[ \frac{S_T} {Q_T} I_{K \geq S_T} | \mathcal{F}_0 ] \\
+& \text{but note that by FAPF, $\frac{S_t}{Q_t} = E^Q[\frac{S_T}{Q_T} | F_t]$, i.e. the term is a Radon-Nykodim derivative. } \\
+= & \frac{K} {Q_T} \mathbb{E}^Q[  I_{K \geq S_T} | \mathcal{F}_0 ] - \frac{S_0} {Q_0} \mathbb{E}^{*}[  I_{K \geq S^*_T} | \mathcal{F}_0 ] \\
+& \text{taking out $Q(t)$ by assuming it's deterministic, and again $Q(0) = 1$} \\
+= & K e^{-rT} \mathbb{P}^Q[K \geq S_T] - S_0 \mathbb{P}^{*}[K \geq S^*_T] \\
 \end{align*}
 
-\subsection{Verify your results by numerical approximation (or otherwise)}
+With some more working, and taking care to use the appropriate measure $Q$ or $*$, this reduces to the Black formula.
+
+\section{Verify your results by numerical approximation (or otherwise)}
 
 \end{document}
