@@ -7,14 +7,23 @@
 \begin{document}
 
 \section*{Exercise}
-For the following products:
+For the following products (in the given order! - you can skip over the starred * ones):
 
-\begin{itemize}
-\item fixed rate, coupon paying bond
-\item interest rate swap pay fixed / receive floating
-\end{itemize}
+\begin{enumerate}
+\item a Margrabe option on Apple and Amazon stock.
+\item a (interest-rate) caplet.
+\item a zero coupon bond, with the Vasicek model as the risk-free rate. If you get stuck, you can look at Jamshidian 1989 ``An Exact Bond Option Formula''.
+\item a zero coupon bond, with the Cox-Ingersoll-Ross model as the risk-free rate.
+\item fixed rate, coupon paying bond using a short-rate model of your choice (pick a simple one - you'll need to calibrate it to market data!). Pick a bond with a short time-to-maturity (ideally $T-t = 2$), to simplify your calculations for numerical results.
+\item * floating rate, coupon paying bond using the same short-rate model from above. Pick a bond with a short time-to-maturity, to simplify your calculations for numerical results.
+\item the same fixed rate bond from above, using Brace-Gatarek-Musiela aka ``LIBOR forward-rate market'' model. This will require a change of measure.
+\item the same floating rate bond from above, using Brace-Gatarek-Musiela aka ``LIBOR forward-rate market'' model. This will require a change of measure. Show your result is consistent with market cap prices (you derived this in (2))
+\item interest rate swap pay fixed / receive floating (Think about how to model this from a cash-flow perspective).
+\item * a European call option, with stock price as GBM, and a stochastic short-rate model of your choice. If it's not possible to price this using a Martingale approach, explain why.
+\item * a European call option, with stock price as GBM, and a stochastic volatility model of your choice. If it's not possible to price this using a Martingale approach, explain why.
+\end{enumerate}
 
-Perform the following exercises:
+Perform the following steps:
 
 \section{Write down the Eber/Jones expression}
 
@@ -90,8 +99,14 @@ This is where you would use 'change of numeraire' if necessary - in this example
 = & K e^{-r(T-t)} \mathbb{P}^Q[K \geq S_T] - S_t \mathbb{P}^{*}[K \geq S^*_T] \\
 \end{align*}
 
-With some more working, and taking care to use the appropriate measure $Q$ or $*$, this reduces to the Black formula.
+With some more working, and taking care to use the appropriate measure $Q$ or $*$, this reduces to the Black-Scholes-Merton formula.
 
 \section{Verify your results by numerical approximation (or otherwise)}
+
+You will need market data for this, e.g. from a Bloomberg terminal or website. Share this data so the results are reproducible.
+
+Do your modelled price match the actual market prices? If not, why not?
+
+Be clear about what data you have used to calibrate your model.
 
 \end{document}
