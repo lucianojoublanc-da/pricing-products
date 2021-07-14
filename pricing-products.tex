@@ -11,19 +11,19 @@ For the following products (in the given order! - you can skip over the starred 
 
 \begin{enumerate}
 \item a Margrabe option on Apple and Amazon stock.
-\item a (interest-rate) caplet.
-\item a zero coupon bond, with the Vasicek model as the risk-free rate. If you get stuck, you can look at Jamshidian 1989 ``An Exact Bond Option Formula''.
-\item a zero coupon bond, with the Cox-Ingersoll-Ross model as the risk-free rate.
+\item a (interest-rate) caplet. This should reduce to the Black-76 formula, which is a special case of the Margrabe formula.
+\item a zero coupon bond, with the Vasicek model as the risk-free rate. If you get stuck, you can look at Jamshidian 1989 ``An Exact Bond Option Formula''. I think the challenge here is finding the equivalent martingale measure, in order to solve analytically.
+\item a zero coupon bond, with the Cox-Ingersoll-Ross model as the risk-free rate. Compare to your previous result. Note this has a different distribution.
 \item fixed rate, coupon paying bond using a short-rate model of your choice (pick a simple one - you'll need to calibrate it to market data!). Pick a bond with a short time-to-maturity (ideally $T-t = 2$), to simplify your calculations for numerical results.
 \item * floating rate, coupon paying bond using the same short-rate model from above. Pick a bond with a short time-to-maturity, to simplify your calculations for numerical results.
 \item the same fixed rate bond from above, using Brace-Gatarek-Musiela aka ``LIBOR forward-rate market'' model. This will require a change of measure.
-\item the same floating rate bond from above, using Brace-Gatarek-Musiela aka ``LIBOR forward-rate market'' model. This will require a change of measure. Show your result is consistent with market cap prices (you derived this in (2))
+\item the same floating rate bond from above, using Brace-Gatarek-Musiela aka ``LIBOR forward-rate market'' model. This will require a change of measure. Show your result is consistent with market cap prices (you derived this in (2)). See (Brigo, Mercurio proposition 6.4.1 - Equivalence between LFM and Black's caplet prices).
 \item interest rate swap pay fixed / receive floating (Think about how to model this from a cash-flow perspective).
 \item * a European call option, with stock price as GBM, and a stochastic short-rate model of your choice. If it's not possible to price this using a Martingale approach, explain why.
 \item * a European call option, with stock price as GBM, and a stochastic volatility model of your choice. If it's not possible to price this using a Martingale approach, explain why.
 \end{enumerate}
 
-Perform the following steps:
+Perform the following steps, showing all your working:
 
 \section{Write down the Eber/Jones expression}
 
@@ -107,6 +107,6 @@ You will need market data for this, e.g. from a Bloomberg terminal or website. S
 
 Do your modelled price match the actual market prices? If not, why not?
 
-Be clear about what data you have used to calibrate your model.
+Be clear about what data you have used to calibrate your model parameters.
 
 \end{document}
